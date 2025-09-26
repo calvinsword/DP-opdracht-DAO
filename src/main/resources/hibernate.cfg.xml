@@ -1,0 +1,40 @@
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+
+        <!-- Database connection settings -->
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/OV-Chip</property>
+        <property name="hibernate.connection.username">postgres</property>
+        <property name="hibernate.connection.password">postgres</property>
+
+        <!-- JDBC connection pool settings -->
+        <property name="hibernate.hikari.minimumIdle">5</property>
+        <property name="hibernate.hikari.maximumPoolSize">20</property>
+
+        <!-- SQL dialect -->
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+
+        <!-- Echo the executed SQL to stdout -->
+<!--        <property name="hibernate.show_sql">true</property>-->
+<!--        <property name="hibernate.format_sql">true</property>-->
+
+
+        <!-- thread is the short name for org.hibernate.context.ThreadLocalSessionContext -->
+        <property name="current_session_context_class">thread</property>
+
+        <!-- Drop and re-create the database schema on startup -->
+        <property name="hibernate.hbm2ddl.auto">update</property>
+
+        <!-- Mapping classes -->
+        <mapping class="domain.Reiziger"/>
+        <mapping class="domain.Adres"/>
+        <mapping class="domain.OVChipkaart"/>
+        <mapping class="domain.Product"/>
+
+
+
+
+    </session-factory>
+</hibernate-configuration>
