@@ -19,10 +19,10 @@ public class Reiziger {
     private String achternaam;
     @Column(name = "geboortedatum")
     private Date geboortedatum;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "reiziger_id")
     private Adres adres;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "reiziger_id")
     private List<OVChipkaart> ovChipkaarten;
 

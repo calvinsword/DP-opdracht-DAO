@@ -2,6 +2,7 @@ package domain;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -16,8 +17,13 @@ public class Product {
     private String beschrijving;
     @Column(name = "prijs")
     private int prijs;
-    @ManyToMany(mappedBy = "alleProdcuten")
-    private List<OVChipkaart> alleOVChipkaarten;
+    @ManyToMany
+    @JoinTable(
+            name = "ov_chipkaart_product",
+            joinColumns = @JoinColumn(name = "product_nummer"),
+            inverseJoinColumns = @JoinColumn(name = "kaart_nummer")
+    )
+    private List<OVChipkaart> alleOVChipkaarten = new ArrayList<>();
 
     public Product(int Product_nummer, String Naam, String Beschrijving, int Prijs) {
         this.product_nummer = Product_nummer;
