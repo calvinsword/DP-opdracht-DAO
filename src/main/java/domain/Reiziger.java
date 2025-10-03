@@ -3,6 +3,7 @@ package domain;
 import jakarta.persistence.*;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -19,12 +20,10 @@ public class Reiziger {
     private String achternaam;
     @Column(name = "geboortedatum")
     private Date geboortedatum;
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "reiziger_id")
+    @OneToOne(mappedBy = "reiziger", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Adres adres;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "reiziger_id")
-    private List<OVChipkaart> ovChipkaarten;
+    @OneToMany(mappedBy = "reiziger", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<OVChipkaart> ovChipkaarten = new ArrayList<>();
 
 
     public Reiziger(int Reiziger_id, String Voorletters, String Tussenvoegsel, String Achternaam, Date Gebortedatum) {
@@ -93,8 +92,35 @@ public class Reiziger {
         this.ovChipkaarten = ovChipkaarten;
     }
 
+    public boolean voegToeOVChipkaart(OVChipkaart kaart) {
+        if (kaart == null) return false;
+        kaart.setReiziger(this);
+        return ovChipkaarten.add(kaart);
+    }
+
+    public boolean verwijderOVChipkaart(OVChipkaart kaart) {
+        if (kaart == null) return false;
+        kaart.setReiziger(null);
+        return ovChipkaarten.remove(kaart);
+    }
+
     @Override
     public String toString() {
-        return(voorletters + ", " + tussenvoegsel + ", " + achternaam + " heeft een reiziger id van: " + reiziger_id + " en een geboorte datum van: " + geboortedatum + ".");
+        StringBuilder reizigerString = new StringBuilder();
+        reizigerString.append(voorletters + ", " + tussenvoegsel + ", " + achternaam + " heeft een reiziger id van: " + reiziger_id + " en een geboorte datum van: " + geboortedatum + ".");
+        if (adres != null) {
+            reizigerString.append(" adres: " + adres.toString());
+        } else {
+            reizigerString.append(" adres: Geen adres geregistreerd");
+        }
+        if (ovChipkaarten != null && !ovChipkaarten.isEmpty()) {
+            reizigerString.append(" OVChipkaarten: ");
+            for (OVChipkaart kaart : ovChipkaarten) {
+                reizigerString.append(kaart.toString()).append(" ");
+            }
+        } else {
+            reizigerString.append(" OVChipkaarten: Geen OVChipkaarten geregistreerd");
+        }
+        return reizigerString.toString();
     }
 }

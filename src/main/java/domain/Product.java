@@ -17,12 +17,7 @@ public class Product {
     private String beschrijving;
     @Column(name = "prijs")
     private int prijs;
-    @ManyToMany
-    @JoinTable(
-            name = "ov_chipkaart_product",
-            joinColumns = @JoinColumn(name = "product_nummer"),
-            inverseJoinColumns = @JoinColumn(name = "kaart_nummer")
-    )
+    @ManyToMany(mappedBy = "alleProducten", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     private List<OVChipkaart> alleOVChipkaarten = new ArrayList<>();
 
     public Product(int Product_nummer, String Naam, String Beschrijving, int Prijs) {
@@ -64,10 +59,21 @@ public class Product {
         return alleOVChipkaarten;
     }
     public void addOVChipkaart(OVChipkaart ovChipkaart) {
-        this.alleOVChipkaarten.add(ovChipkaart);
+        if (!alleOVChipkaarten.contains(ovChipkaart)) {
+            alleOVChipkaarten.add(ovChipkaart);
+        }
     }
     @Override
     public String toString() {
-        return ("Product " + product_nummer + " met naam " + naam + " heeft beschrijving " + beschrijving + " en een prijs van " + prijs);
+        StringBuilder productString = new StringBuilder();
+        productString.append("Product " + product_nummer + " met naam " + naam + " heeft beschrijving " + beschrijving + " en een prijs van " + prijs);
+        if (alleOVChipkaarten != null && !alleOVChipkaarten.isEmpty()) {
+            productString.append(" en is gekoppeld aan OVChipkaarten: ");
+            for (OVChipkaart ovChipkaart : alleOVChipkaarten) {
+                productString.append(ovChipkaart.getId()).append(" ");
+            }
+        }
+        return productString.toString();
+
     }
 }

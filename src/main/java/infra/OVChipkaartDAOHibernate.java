@@ -2,6 +2,7 @@ package infra;
 
 import data.OVChipkaartDAO;
 import domain.OVChipkaart;
+import domain.Product;
 import domain.Reiziger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -38,12 +39,15 @@ public class OVChipkaartDAOHibernate implements OVChipkaartDAO {
         }
     }
 
-    @Override
     public boolean delete(OVChipkaart ovChipkaart) {
         try {
-            // Merge is nodig als het object detached is
-            OVChipkaart buffer = (OVChipkaart) session.merge(ovChipkaart);
-            session.delete(buffer);
+            List<Product> ovProducten = List.copyOf(ovChipkaart.getAlleProducten());
+            for (Product p : ovProducten) {
+                ovChipkaart.removeProduct(p);
+            }
+            session.update(ovChipkaart);
+
+            session.delete(ovChipkaart);
             return true;
         } catch (HibernateException e) {
             e.printStackTrace();

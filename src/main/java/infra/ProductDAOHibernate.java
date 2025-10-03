@@ -51,8 +51,12 @@ public class ProductDAOHibernate implements ProductDAO {
     @Override
     public boolean delete(Product pr) throws SQLException {
         try {
-            Product buffer = (Product) session.merge(pr);
-            session.delete(buffer);
+            List<OVChipkaart> ovChipkaarten = List.copyOf(pr.getAlleOVChipkaarten());
+            for (OVChipkaart ov : ovChipkaarten) {
+                ov.removeProduct(pr);
+                session.update(ov);
+            }
+            session.delete(pr);
             return true;
         } catch (HibernateException e) {
             System.err.println("Fout bij verwijderen van Product: " + e.getMessage());

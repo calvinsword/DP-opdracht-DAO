@@ -3,6 +3,7 @@ package domain;
 import jakarta.persistence.*;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,13 +21,13 @@ public class OVChipkaart {
     @ManyToOne
     @JoinColumn(name = "reiziger_id")
     private Reiziger reiziger;
-    @ManyToMany
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinTable(
             name = "ov_chipkaart_product",
             joinColumns = @JoinColumn(name = "kaart_nummer"),
             inverseJoinColumns = @JoinColumn(name = "product_nummer")
     )
-    private List<Product> alleProdcuten;
+    private List<Product> alleProducten = new ArrayList<>();
 
     public OVChipkaart(int id, Date geldig_tot, int klasse, long saldo, Reiziger reiziger) {
         this.id = id;
@@ -69,16 +70,39 @@ public class OVChipkaart {
     public void setReiziger(Reiziger reiziger) {
         this.reiziger = reiziger;
     }
-    public List<Product> getAlleProdcuten() {
-        return alleProdcuten;
+    public List<Product> getAlleProducten() {
+        return alleProducten;
     }
-    public void addProdcut(Product p) {
-        alleProdcuten.add(p);
+    public boolean addProduct(Product p) {
+        if (!alleProducten.contains(p)) {
+            alleProducten.add(p);
+            p.addOVChipkaart(this);
+            return true;
+        }
+        return false;
+    }
+    public boolean removeProduct(Product p) {
+        if (alleProducten.contains(p)) {
+            alleProducten.remove(p);
+            p.getAlleOVChipkaarten().remove(this);
+            return true;
+        }
+        return false;
     }
 
     @Override
     public String toString() {
-        return ("OVKaart " + id + " is geldig tot " + geldig_tot + " en met klasse " + klasse + " heeft een saldo van €" + saldo + " en in bezit van " + reiziger.getnaam());
+        StringBuilder ovString = new StringBuilder();
+        ovString.append("OVKaart " + id + " is geldig tot " + geldig_tot + " en met klasse " + klasse + " heeft een saldo van €" + saldo + " en in bezit van " + reiziger.getnaam());
+        if (alleProducten != null && !alleProducten.isEmpty()) {
+            ovString.append(" met producten: ");
+            for (Product p : alleProducten) {
+                ovString.append(p.getNaam()).append(" ");
+            }
+        } else {
+            ovString.append(" met geen producten");
+        }
+        return ovString.toString();
     }
 
 }
